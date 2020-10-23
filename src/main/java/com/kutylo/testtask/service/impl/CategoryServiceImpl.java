@@ -3,11 +3,8 @@ package com.kutylo.testtask.service.impl;
 import com.kutylo.testtask.dto.request.CategoryRequest;
 import com.kutylo.testtask.dto.response.CategoryResponse;
 import com.kutylo.testtask.mapper.CategoryMapper;
-import com.kutylo.testtask.mapper.ProductMapper;
 import com.kutylo.testtask.model.Category;
-import com.kutylo.testtask.model.Product;
 import com.kutylo.testtask.repository.CategoryRepository;
-import com.kutylo.testtask.repository.ProductRepository;
 import com.kutylo.testtask.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +14,8 @@ import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
 @RequiredArgsConstructor
+@Service
 @Slf4j
 public class CategoryServiceImpl implements CategoryService {
 

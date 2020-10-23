@@ -46,6 +46,15 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<ProductResponse> findProductsByCategory(String category) {
+        List<Product> products = productRepository.findProductByCategoryName(category);
+
+        return products.stream()
+                .map(productMapper::modelToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public ProductResponse saveProduct(ProductRequest productRequest) {
         log.info("Saving product = " + productRequest);
 
@@ -56,7 +65,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse updateProduct(ProductRequest productRequest, int id) {
+    public ProductResponse updateProductById(ProductRequest productRequest, int id) {
         log.info("Update product with id: " + id);
 
         Product product = productMapper.requestToModel(productRequest);
@@ -67,7 +76,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void deleteProduct(int id) {
+    public void deleteProductById(int id) {
         log.info("Deleting product with id = " + id);
 
         productRepository.deleteById(id);
