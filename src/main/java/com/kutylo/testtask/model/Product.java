@@ -30,7 +30,7 @@ public class Product {
     private String description;
 
     @Column(name = "price")
-    private String price;
+    private double price;
 
     @ManyToOne
     @JoinColumn(name = "category_id")

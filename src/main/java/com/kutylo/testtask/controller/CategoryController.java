@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,7 +55,7 @@ public class CategoryController {
     })
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public CategoryResponse saveNewCategory(@RequestBody CategoryRequest categoryRequest) {
+    public CategoryResponse saveNewCategory(@RequestBody @Validated CategoryRequest categoryRequest) {
         return categoryService.saveCategory(categoryRequest);
     }
 
@@ -66,7 +67,7 @@ public class CategoryController {
     })
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
-    public CategoryResponse updateCategory(@PathVariable int id, @RequestBody CategoryRequest categoryRequest) {
+    public CategoryResponse updateCategory(@PathVariable int id, @Validated @RequestBody CategoryRequest categoryRequest) {
         return categoryService.updateCategoryById(id, categoryRequest);
     }
 

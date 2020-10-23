@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -63,7 +64,7 @@ public class ProductController {
     })
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ProductResponse saveNewProduct(@RequestBody ProductRequest productRequest) {
+    public ProductResponse saveNewProduct(@RequestBody @Validated ProductRequest productRequest) {
         return productService.saveProduct(productRequest);
     }
 
@@ -74,7 +75,7 @@ public class ProductController {
     })
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
-    public ProductResponse updateProductById(@RequestBody ProductRequest productRequest, @PathVariable int id) {
+    public ProductResponse updateProductById(@RequestBody @Validated ProductRequest productRequest, @PathVariable int id) {
         return productService.updateProductById(productRequest, id);
     }
 
