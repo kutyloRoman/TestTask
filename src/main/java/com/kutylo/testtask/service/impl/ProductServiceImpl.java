@@ -85,6 +85,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse updateProductById(ProductRequest productRequest, int id, String currency) {
         log.info("Update product with id: " + id);
+        checkValidProduct(id);
         checkValidCategory(productRequest.getCategory().getId());
 
         Product product = productMapper.requestToModel(productRequest);
@@ -98,7 +99,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteProductById(int id) {
         log.info("Deleting product with id = " + id);
-
+        checkValidProduct(id);
         productRepository.deleteById(id);
     }
 
@@ -107,6 +108,14 @@ public class ProductServiceImpl implements ProductService {
         if (!categoryRepository.existsById(id)) {
             log.error("Category with id = " + id + " not found");
             throw new EntityNotFoundException("Category with id = " + id + " not found");
+        }
+    }
+
+    private void checkValidProduct(int id) {
+        log.info("Checking product with id = " + id);
+        if (!productRepository.existsById(id)) {
+            log.error("Product with id = " + id + " not found");
+            throw new EntityNotFoundException("Product with id = " + id + " not found");
         }
     }
 
