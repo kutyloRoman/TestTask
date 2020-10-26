@@ -12,9 +12,9 @@ public interface ProductService {
 
     List<ProductResponse> findProductsByCategory(String category);
 
-    ProductResponse saveProduct(ProductRequest productRequest);
+    ProductResponse saveProduct(ProductRequest productRequest, String currency);
 
-    ProductResponse updateProductById(ProductRequest productRequest, int id);
+    ProductResponse updateProductById(ProductRequest productRequest, int id, String currency);
 
     void deleteProductById(int id);
 }

@@ -2,25 +2,40 @@ package com.kutylo.testtask.service.impl;
 
 import com.kutylo.testtask.dto.request.ProductRequest;
 import com.kutylo.testtask.dto.response.ProductResponse;
+import com.kutylo.testtask.feign.fixer.FixerClient;
+import com.kutylo.testtask.feign.fixer.FixerResponse;
+import com.kutylo.testtask.handler.exception.FixerException;
 import com.kutylo.testtask.mapper.ProductMapper;
 import com.kutylo.testtask.model.Product;
+import com.kutylo.testtask.repository.CategoryRepository;
 import com.kutylo.testtask.repository.ProductRepository;
 import com.kutylo.testtask.service.ProductService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 @Slf4j
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+    private final CategoryRepository categoryRepository;
+    private final FixerClient fixerClient;
+
+    public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper, CategoryRepository categoryRepository, FixerClient fixerClient) {
+        this.productRepository = productRepository;
+        this.productMapper = productMapper;
+        this.categoryRepository = categoryRepository;
+        this.fixerClient = fixerClient;
+    }
 
     @Override
     public List<ProductResponse> findAllProducts() {
@@ -47,6 +62,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductResponse> findProductsByCategory(String category) {
+        log.info("Getting product by category name:" + category);
         List<Product> products = productRepository.findProductByCategoryName(category);
 
         return products.stream()
@@ -55,20 +71,24 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse saveProduct(ProductRequest productRequest) {
+    public ProductResponse saveProduct(ProductRequest productRequest, String currency) {
         log.info("Saving product = " + productRequest);
+        checkValidCategory(productRequest.getCategory().getId());
 
         Product product = productMapper.requestToModel(productRequest);
+        product.setPrice(product.getPrice().divide(getRateOfGivenCurrency(currency), 3, RoundingMode.HALF_UP));
         productRepository.save(product);
 
         return productMapper.modelToResponse(product);
     }
 
     @Override
-    public ProductResponse updateProductById(ProductRequest productRequest, int id) {
+    public ProductResponse updateProductById(ProductRequest productRequest, int id, String currency) {
         log.info("Update product with id: " + id);
+        checkValidCategory(productRequest.getCategory().getId());
 
         Product product = productMapper.requestToModel(productRequest);
+        product.setPrice(product.getPrice().divide(getRateOfGivenCurrency(currency), 3, RoundingMode.HALF_UP));
         product.setId(id);
         productRepository.save(product);
 
@@ -80,5 +100,29 @@ public class ProductServiceImpl implements ProductService {
         log.info("Deleting product with id = " + id);
 
         productRepository.deleteById(id);
+    }
+
+    private void checkValidCategory(int id) {
+        log.info("Checking category with id = " + id);
+        if (!categoryRepository.existsById(id)) {
+            log.error("Category with id = " + id + " not found");
+            throw new EntityNotFoundException("Category with id = " + id + " not found");
+        }
+    }
+
+    private BigDecimal getRateOfGivenCurrency(String currency) {
+        log.info("Getting rate of " + currency + " currency");
+        FixerResponse fixerResponse = fixerClient.getRecentExchangeRateData();
+        if (fixerResponse.isSuccess()) {
+            Map<String, Double> rates = fixerResponse.getRates();
+            if (rates.containsKey(currency.toUpperCase())) {
+                return BigDecimal.valueOf(rates.get(currency));
+            } else {
+                log.error(currency + " currency not found");
+                throw new IllegalArgumentException(currency + " currency not found");
+            }
+        }
+        log.error("Fixer.io return incorrect response");
+        throw new FixerException("Fixer error");
     }
 }

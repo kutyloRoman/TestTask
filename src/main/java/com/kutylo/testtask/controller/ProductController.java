@@ -1,5 +1,6 @@
 package com.kutylo.testtask.controller;
 
+
 import com.kutylo.testtask.dto.request.ProductRequest;
 import com.kutylo.testtask.dto.response.ProductResponse;
 import com.kutylo.testtask.service.ProductService;
@@ -64,8 +65,8 @@ public class ProductController {
     })
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ProductResponse saveNewProduct(@RequestBody @Validated ProductRequest productRequest) {
-        return productService.saveProduct(productRequest);
+    public ProductResponse saveNewProduct(@RequestBody @Validated ProductRequest productRequest, String currency) {
+        return productService.saveProduct(productRequest, currency);
     }
 
     @ApiOperation(value = "Update product by id")
@@ -75,8 +76,8 @@ public class ProductController {
     })
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
-    public ProductResponse updateProductById(@RequestBody @Validated ProductRequest productRequest, @PathVariable int id) {
-        return productService.updateProductById(productRequest, id);
+    public ProductResponse updateProductById(@RequestBody @Validated ProductRequest productRequest, @PathVariable int id, String currency) {
+        return productService.updateProductById(productRequest, id, currency);
     }
 
     @ApiOperation(value = "Delete product by id")

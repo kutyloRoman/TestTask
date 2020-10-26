@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "product")
@@ -30,7 +31,7 @@ public class Product {
     private String description;
 
     @Column(name = "price")
-    private double price;
+    private BigDecimal price;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
